@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from inspect import currentframe
 from mimetypes import init
 from pacman import SCARED_TIME
 from util import manhattanDistance
@@ -72,6 +73,7 @@ class ReflexAgent(Agent):
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         init_pos = currentGameState.getPacmanPosition()
         newPos = successorGameState.getPacmanPosition()
+        food = currentGameState.getFood()
         newFood = successorGameState.getFood()
         # 10 points for every food you eat 
         """
@@ -138,7 +140,10 @@ class ReflexAgent(Agent):
         #if it brings closer to ghost, malus 
         def closer_to_ghost(element, currentGameState, next_PAC, score):
           if closer_to(element, currentGameState, next_PAC):
-            score -= 10
+            if newScaredTimes[0]:
+              score += 20
+            else : 
+              score -=10
           return score
 
         # Return the Closes ghost to pacman
@@ -154,6 +159,7 @@ class ReflexAgent(Agent):
         def generate_forbidden_zone(ghostPositions):
           forbidden_zone = []
           for ghost in ghostPositions:
+            stop = ghost
             north = (ghost[0], ghost[1] + 1)
             south = (ghost[0], ghost[1] - 1)
             east = (ghost[0] + 1, ghost[1])
@@ -163,9 +169,7 @@ class ReflexAgent(Agent):
             forbidden_zone.append(south)
             forbidden_zone.append(east)
             forbidden_zone.append(west)
-            
-          # print(forbidden_zone)
-          # a = raw_input()
+            forbidden_zone.append(stop)
           return forbidden_zone
         
         # Forbid pacman to go to the a next possible ghost position 
@@ -182,7 +186,7 @@ class ReflexAgent(Agent):
               if manhattanDistance(Capsule, init_pos) < dist :
                 dist = manhattanDistance(Capsule, init_pos)
                 closest_Caps = Capsule
-            return Capsule, dist
+            return closest_Caps, dist
           return None
         
         # if ghost close : go to capsule if there is capsule left 
@@ -216,16 +220,22 @@ class ReflexAgent(Agent):
 
         score = 0    
         generate_forbidden_zone(ghostPositions)
-        score = forbidden(newPos, score) 
-        score = closer_to_ghost(closest_ghost(newPos, ghostPositions)[0], currentGameState, newPos, score) #if pacman is going cloaser to the closest ghost it's bad 
-        score = food_next(newPos, newFood, score)  #if it can eat food on it's next move, it's good 
+        # score = forbidden(newPos, score) 
+        # score = closer_to_ghost(closest_ghost(newPos, ghostPositions)[0], currentGameState, newPos, score) #if pacman is going cloaser to the closest ghost it's bad 
+        # score = food_next(newPos, newFood, score)  #if it can eat food on it's next move, it's good 
+        # score = closest_food(newFood, currentGameState, successorGameState, score) #if goes closer to the closest food, that's good 
+        # score = get_Capsule(newCapsule, newFood, newScaredTimes, score)
+        # score = FCK_THE_GHOST(newScaredTimes, currentGameState, newPos, score)
+        
+        score = food_next(newPos, food, score)  #if it can eat food on it's next move, it's good 
         score = closest_food(newFood, currentGameState, successorGameState, score) #if goes closer to the closest food, that's good 
+        score = forbidden(newPos, score)
         score = get_Capsule(newCapsule, newFood, newScaredTimes, score)
         score = FCK_THE_GHOST(newScaredTimes, currentGameState, newPos, score)
+        score = closer_to_ghost(closest_ghost(newPos, ghostPositions)[0], currentGameState, newPos, score)
         
-        print(action)
-        print(score)
-        a = raw_input()
+
+        #a = raw_input()
         return  score 
         #please change the return score as the score you want
 
