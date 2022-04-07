@@ -220,13 +220,6 @@ class ReflexAgent(Agent):
 
         score = 0    
         generate_forbidden_zone(ghostPositions)
-        # score = forbidden(newPos, score) 
-        # score = closer_to_ghost(closest_ghost(newPos, ghostPositions)[0], currentGameState, newPos, score) #if pacman is going cloaser to the closest ghost it's bad 
-        # score = food_next(newPos, newFood, score)  #if it can eat food on it's next move, it's good 
-        # score = closest_food(newFood, currentGameState, successorGameState, score) #if goes closer to the closest food, that's good 
-        # score = get_Capsule(newCapsule, newFood, newScaredTimes, score)
-        # score = FCK_THE_GHOST(newScaredTimes, currentGameState, newPos, score)
-        
         score = food_next(newPos, food, score)  #if it can eat food on it's next move, it's good 
         score = closest_food(newFood, currentGameState, successorGameState, score) #if goes closer to the closest food, that's good 
         score = forbidden(newPos, score)
